@@ -1,9 +1,12 @@
 class board:
     
-    def __init__(self, grid = None):
-        self.player = 1
+    def __init__(self, grid = None, turn = 1):
+        self.player = turn
         if grid == None:
             self.grid = [["." for _ in range(8)] for _ in range(8)]
+        else :
+            self.grid = grid
+        self.size = len(self.grid)
     
     def __repr__(self):
         out = ""
@@ -16,9 +19,14 @@ class board:
         return out
     
     def copy(self):
-        return board([[j for j in i] for i in self.grid])
+        return board([[j for j in i] for i in self.grid], self.player)
     
+    def can_play(self, col):
+        return list(map(lambda x: x[col-1], self.grid)).count(".") != 0
+
     def play(self, col):
+        if list(map(lambda x: x[col-1], self.grid)).count(".") == 0:
+            raise Exception(f"Cannot play on col {col}")
         self.grid[list(map(lambda x: x[col-1], self.grid)).count(".")-1][col-1] = "O" if self.player == 1 else "X"
         self.player = self.player%2+1
     
@@ -37,11 +45,55 @@ class board:
             elif "XXXX" in i:
                 return 2
         return 0
+        
+    def eval(self, n):
+        if self.state() == 0:
+            if n == 0:
+                return 0
+            else :
+                outcome = []
+                for i in range(1, self.size+1):
+                    test = board.copy(self)
+                    if not test.can_play(i):
+                        outcome.append(None)
+                    else :
+                        test.play(i)
+                        outcome.append(test.eval(n-1))
+                if self.player in outcome:
+                    return self.player
+                elif 0 in outcome:
+                    return 0
+                else :
+                    return self.player%2+1
+        else :
+            return self.state()
 
-test = board()
-while True:
-    test.play(int(input(">> ")))
-    print(test)
-    if test.state() != 0:
-        print(f"Player {test.state()} won")
-        break
+    def choose(self, n = 3):
+        outcome = []
+        for i in range(1, self.size+1):
+            test = board.copy(self)
+            if not test.can_play(i):
+                outcome.append(None)
+            else :
+                test.play(i)
+                outcome.append(test.eval(n))
+        print(outcome)
+        if self.player in outcome:
+            return outcome.index(self.player)+1
+        elif 0 in outcome:
+            return outcome.index(0)+1
+        else :
+            return outcome.index(self.player%2+1)+1
+
+if __name__ == "__main__":
+    brd = board()
+    while True:
+        brd.play(int(input(">> ")))
+        if brd.state() != 0:
+            print(f"Player {brd.state()} won")
+            break
+        brd.play(brd.choose())
+        if brd.state() != 0:
+            print(f"Player {brd.state()} won")
+            break
+        print(brd)
