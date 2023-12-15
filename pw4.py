@@ -1,3 +1,5 @@
+from random import choice
+
 class board:
     
     def __init__(self, grid = None, turn = 1):
@@ -79,11 +81,11 @@ class board:
                 outcome.append(test.eval(n))
         print(outcome)
         if self.player in outcome:
-            return outcome.index(self.player)+1
+            return choice([i for i in range(len(outcome)) if outcome[i] == self.player]) + 1
         elif 0 in outcome:
-            return outcome.index(0)+1
+            return choice([i for i in range(len(outcome)) if outcome[i] == 0]) + 1
         else :
-            return outcome.index(self.player%2+1)+1
+            return choice([i for i in range(len(outcome)) if outcome[i] == self.player%2+1]) + 1
 
 if __name__ == "__main__":
     brd = board()
@@ -94,6 +96,7 @@ if __name__ == "__main__":
             break
         brd.play(brd.choose())
         if brd.state() != 0:
+            print(brd)
             print(f"Player {brd.state()} won")
             break
         print(brd)
