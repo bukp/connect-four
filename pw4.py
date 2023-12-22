@@ -82,6 +82,8 @@ class board:
     def eval(self, n = 4):
         if n == 0 :
             return (None, self.static_eval())
+        elif self.state() != 0:
+            return (None, self.static_eval())
         else :
             if self.player == 1:
                 best = (0, float("-inf"))
@@ -89,11 +91,8 @@ class board:
                     copy = self.copy()
                     if copy.can_play(i):
                         copy.play(i)
-                        if copy.state() == 0:
-                            test = (i, copy.eval(n-1)[1])
-                        else :
-                            test = (i, copy.static_eval())
-                        if test[1] > best[1]:
+                        test = (i, copy.eval(n-1)[1])
+                        if test[1] >= best[1]:
                             best = test
                 return best
             else :
@@ -102,11 +101,8 @@ class board:
                     copy = self.copy()
                     if copy.can_play(i):
                         copy.play(i)
-                        if copy.state() == 0:
-                            test = (i, copy.eval(n-1)[1])
-                        else :
-                            test = (i, copy.static_eval())
-                        if test[1] < best[1]:
+                        test = (i, copy.eval(n-1)[1])
+                        if test[1] <= best[1]:
                             best = test
                 return best
 
